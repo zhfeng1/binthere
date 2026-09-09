@@ -6,8 +6,10 @@
 # Worker script name is "binthere" (→ deploy URL binthere.<subdomain>.workers.dev);
 # the KV namespace keeps the "PASTES" name.
 name = "binthere"
+account_id = "f8fbe3ff6e6512e3c15d33478638c6d5"
 main = "src/index.js"
 compatibility_date = "2025-10-11"
+workers_dev = true
 
 # ── Static assets ────────────────────────────────────────────────────────────
 # The frontend lives in public/. The Worker runs first only for /api/*; every
@@ -24,8 +26,8 @@ run_worker_first = [ "/api/*" ]
 # then paste the id below (and a preview_id for local dev).
 [[kv_namespaces]]
 binding = "PASTES"
-id = "fd20757b64cf4491a67a96b36263613e"
-preview_id = "3cea39cba48443d2babc78f1af07f39f"
+id = "98a84aa56fe34562b9ff5f5c22510e48"
+preview_id = "4056747d2d6848b9a8c64c91487d2917"
 
 # ── Durable Object: burn-after-read pastes (atomic single-consumer) ──────────
 [[durable_objects.bindings]]
@@ -40,7 +42,7 @@ new_sqlite_classes = [ "BurnPaste" ]
 # Abuse mitigation, not authentication; the code fails open if unavailable.
 [[ratelimits]]
 name = "CREATE_RL"
-namespace_id = "1001"
+namespace_id = "709092026"
 
   [ratelimits.simple]
   limit = 30
