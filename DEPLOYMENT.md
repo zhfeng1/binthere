@@ -8,6 +8,12 @@ This instance runs as the `binthere` Cloudflare Worker, with Workers Static
 Assets, its own production and preview KV namespaces, the SQLite-backed
 `BurnPaste` Durable Object, and a limit of 30 note creations per minute per IP.
 
+The web interface defaults to Simplified Chinese. The language button in the
+top-right corner switches between Chinese and English without reloading the
+page or changing notes, passwords, or links. The choice is saved locally.
+Translations live in `public/js/i18n.js`; marked interface elements retain
+their English source message as a stable translation key.
+
 ## Update this instance
 
 Use Node.js 22 or newer, then run from this repository:

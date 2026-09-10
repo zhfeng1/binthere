@@ -9,7 +9,7 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { parseStars } from '../src/lib/stars.js';
 
 const ORIGIN = 'https://binthere.test';
-const REPO_API = 'https://api.github.com/repos/nxfu/binthere';
+const REPO_API = 'https://api.github.com/repos/zhfeng1/binthere';
 
 // The suite runs inside the Worker, so stubbing the global reaches the
 // subrequest fetchStars makes.
@@ -33,7 +33,7 @@ afterEach(() => {
 
 describe('GET /api/stars', () => {
   it('answers with the count and lets it be cached', async () => {
-    const calls = mockRepo(200, { stargazers_count: 49, full_name: 'nxfu/binthere' });
+    const calls = mockRepo(200, { stargazers_count: 49, full_name: 'zhfeng1/binthere' });
 
     const res = await SELF.fetch(`${ORIGIN}/api/stars`);
     expect(res.status).toBe(200);

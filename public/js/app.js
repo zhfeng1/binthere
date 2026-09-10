@@ -9,6 +9,7 @@ import { validateHead, validatePaste, buildAAD, EXPIRE_SECONDS } from './format.
 import { renderMarkdown } from './markdown.js';
 import { looksLikeCode, highlightInto } from './highlight.js';
 import { $, showView, toast, copyText, flashCopied, pill } from './ui.js';
+import { initI18n, setText, setAttributeText, t } from './i18n.js';
 
 // Module-level state referenced by helpers that may run during the top-level
 // route dispatch below. Declared here (not near the timer helpers further down)
@@ -19,6 +20,7 @@ let expiryTimer = null;
 
 // ── boot ─────────────────────────────────────────────────────────────────────
 const route = location.pathname.match(/^\/p\/([^/]+)\/?$/);
+initI18n();
 if (route) {
   let id = null;
   // Malformed percent-encoding must not throw during module evaluation (it
@@ -70,7 +72,6 @@ function initCreate() {
   // CLI/API) supports the full expiry range; the web client does not expose it.
   async function submitPaste(password) {
     createBtn.disabled = true;
-    const label = sendTxt ? sendTxt.textContent : '';
     // Press → the arrow leaves the button (`.sending`), then the composer follows
     // it out and the success view takes over, so the arrow leads the navigation.
     // Skipped under reduced motion: the CSS travel is off there, so the 32px jump
@@ -81,9 +82,9 @@ function initCreate() {
       createBtn.classList.add('sending');
       // The label waits for the arrow to clear — swapping it mid-flight resizes
       // the button and jogs the icon the eye is following.
-      relabel = setTimeout(() => { if (sendTxt) sendTxt.textContent = 'Encrypting…'; }, ARROW_LEAD_MS);
+      relabel = setTimeout(() => setText(sendTxt, 'Encrypting…'), ARROW_LEAD_MS);
     } else if (sendTxt) {
-      sendTxt.textContent = 'Encrypting…';
+      setText(sendTxt, 'Encrypting…');
     }
     const arrowGone = animate ? wait(ARROW_LEAD_MS) : null;
     try {
@@ -110,7 +111,7 @@ function initCreate() {
       createBtn.classList.remove('sending'); // the arrow glides back in
       showMsg(msg, friendlyError(e));
       createBtn.disabled = false;
-      if (sendTxt) sendTxt.textContent = label;
+      setText(sendTxt, 'Create link');
     }
   }
 }
@@ -213,8 +214,7 @@ function showSuccess({ id, deletetoken, url, isBurn }) {
   showView('success');
   $('#paste-url').textContent = url;
   if (isBurn) {
-    $('#success-note').textContent =
-      'Anyone with this link can read the note once.';
+    setText($('#success-note'), 'Anyone with this link can read the note once.');
   }
   renderQr(url);
 
@@ -228,22 +228,21 @@ function showSuccess({ id, deletetoken, url, isBurn }) {
 
   const delBtn = $('#delete-btn');
   const sMsg = $('#success-msg');
-  const delLabel = delBtn.textContent;
   armConfirm(delBtn, 'Permanently delete?', async () => {
     delBtn.disabled = true;
-    delBtn.textContent = 'Deleting…';
+    setText(delBtn, 'Deleting…');
     try {
       await deletePaste(id, deletetoken);
       showMsg(sMsg, 'This paste has been deleted.');
       toast('deleted');
-      delBtn.textContent = 'Deleted';
+      setText(delBtn, 'Deleted');
       // The link is dead now — don't leave live-looking actions pointing at it.
       $('#open-link').disabled = true;
       $('#copy-url').disabled = true;
     } catch (e) {
       showMsg(sMsg, friendlyError(e));
       delBtn.disabled = false;
-      delBtn.textContent = delLabel;
+      setText(delBtn, 'Delete now');
     }
   });
 }
@@ -254,18 +253,18 @@ function showSuccess({ id, deletetoken, url, isBurn }) {
 // second activation within the window confirms. Disarms on timeout or blur so
 // an abandoned half-click can't linger as a landmine.
 function armConfirm(btn, armedLabel, onConfirm) {
-  const label = btn.textContent;
+  const label = btn.dataset.i18n || btn.textContent;
   let timer = null;
   const disarm = () => {
     if (timer === null) return;
     clearTimeout(timer);
     timer = null;
-    btn.textContent = label;
+    setText(btn, label);
     btn.classList.remove('armed');
   };
   btn.onclick = () => {
     if (timer !== null) { disarm(); onConfirm(); return; }
-    btn.textContent = armedLabel;
+    setText(btn, armedLabel);
     btn.classList.add('armed');
     timer = setTimeout(disarm, 5000);
   };
@@ -414,9 +413,9 @@ function wirePasswordScreen(isBurn, verify) {
   wirePeek(['#decrypt-password', '#peek2']);
   const sub = $('#password-subtitle');
   if (sub) {
-    sub.textContent = isBurn
+    setText(sub, isBurn
       ? 'This single-use note is password-protected. It is destroyed only once the correct password unlocks it.'
-      : 'This note is protected by a password in addition to the key in the link.';
+      : 'This note is protected by a password in addition to the key in the link.');
   }
   const input = $('#decrypt-password');
   const btn = $('#decrypt-btn');
@@ -436,8 +435,7 @@ function wirePasswordScreen(isBurn, verify) {
     btn.disabled = true;
     // Password key derivation (PBKDF2) takes real time — say so, like the
     // create button's "Encrypting…".
-    const label = btn.textContent;
-    btn.textContent = 'Decrypting…';
+    setText(btn, 'Decrypting…');
     try {
       await verify(input.value);
       input.value = ''; // verified — don't leave the password in the hidden DOM
@@ -449,7 +447,7 @@ function wirePasswordScreen(isBurn, verify) {
         : 'Wrong password — try again. If you are sure it is correct, the link may be corrupted or altered.');
       inFlight = false;
       btn.disabled = false;
-      btn.textContent = label;
+      setText(btn, 'Decrypt');
       input.focus();
     }
   };
@@ -495,8 +493,8 @@ function renderPaste(paste, result) {
 
   const rawBtn = $('#toggle-raw');
   rawBtn.hidden = !isMarkdown;
-  rawBtn.textContent = 'Raw';
-  rawBtn.onclick = () => { showRaw = !showRaw; rawBtn.textContent = showRaw ? 'Rendered' : 'Raw'; draw(); };
+  setText(rawBtn, 'Raw');
+  rawBtn.onclick = () => { showRaw = !showRaw; setText(rawBtn, showRaw ? 'Rendered' : 'Raw'); draw(); };
 
   $('#copy-content').onclick = async () => {
     toast((await copyText(result.text)) ? 'copied to clipboard' : 'copy failed');
@@ -559,7 +557,7 @@ function wirePeek(...pairs) {
     for (const { input, btn } of fields) {
       input.type = show ? 'text' : 'password';
       btn.classList.toggle('revealed', show);
-      btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      setAttributeText(btn, 'aria-label', show ? 'Hide password' : 'Show password');
       btn.setAttribute('aria-pressed', String(show));
     }
   };
@@ -582,7 +580,7 @@ function status(message, isError = false, { reveal = false } = {}) {
   // restarts it explicitly. Prevents a stale timer ticking under a later screen.
   stopExpiryTimer();
   const el = $('#status-msg');
-  el.textContent = message;
+  setText(el, message);
   el.classList.toggle('error', isError);
   // Error states get a warning glyph + a "Create new paste" action, like the
   // reference expired screen. The burn "reveal once" prompt keeps its own action.
@@ -640,7 +638,7 @@ function startExpiryTimer(meta, onExpire) {
 // ms → H:MM:SS (or MM:SS under an hour). Clamps at 0 (shows "expired").
 function formatDuration(ms) {
   const total = Math.floor(ms / 1000);
-  if (total <= 0) return 'expired';
+  if (total <= 0) return t('expired');
   const h = Math.floor(total / 3600);
   const m = Math.floor((total % 3600) / 60);
   const s = total % 60;
@@ -649,7 +647,7 @@ function formatDuration(ms) {
 }
 
 function showMsg(el, message) {
-  el.textContent = message;
+  setText(el, message);
   el.hidden = false;
 }
 
@@ -657,7 +655,10 @@ function friendlyError(e) {
   if (e instanceof ApiError) {
     if (e.status === 429) return 'Too many pastes from your network — please wait a moment.';
     if (e.status === 413) return 'That document is too large.';
-    return e.message || 'Server error. Please try again.';
+    if (e.status === 400) return 'Invalid note data. Please try again.';
+    if (e.status === 403) return 'Could not delete this note. Please try again.';
+    if (e.status === 404 || e.status === 410) return 'This note no longer exists.';
+    return 'Server error. Please try again.';
   }
   if (e && /too large/.test(e.message || '')) return 'That document is too large (1 MiB max).';
   return 'Something went wrong. Please try again.';

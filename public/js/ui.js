@@ -1,4 +1,5 @@
 // ui.js — small DOM helpers for the client. No innerHTML on user content.
+import { setText } from './i18n.js';
 
 export const $ = (sel, root = document) => root.querySelector(sel);
 
@@ -30,7 +31,7 @@ let toastTimer;
 export function toast(message) {
   const t = document.getElementById('toast');
   if (!t) return;
-  t.textContent = message;
+  setText(t, message);
   t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
@@ -64,12 +65,12 @@ export async function copyText(text) {
 /** Flash a copy button into its "copied" state briefly. */
 export function flashCopied(btn, label = 'copied') {
   if (!btn) return;
-  const original = btn.dataset.label || btn.textContent;
+  const original = btn.dataset.label || btn.dataset.i18n || btn.textContent;
   btn.dataset.label = original;
-  btn.textContent = label;
+  setText(btn, label);
   btn.classList.add('copied');
   setTimeout(() => {
-    btn.textContent = btn.dataset.label;
+    setText(btn, btn.dataset.label);
     btn.classList.remove('copied');
   }, 1600);
 }
@@ -78,6 +79,6 @@ export function flashCopied(btn, label = 'copied') {
 export function pill(text, kind) {
   const el = document.createElement('span');
   el.className = kind ? `pill ${kind}` : 'pill';
-  el.textContent = text;
+  setText(el, text);
   return el;
 }

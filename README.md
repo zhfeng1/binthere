@@ -1,3 +1,9 @@
+> **简体中文适配版** · [打开本站](https://binthere.zhf-mike.workers.dev) · [部署说明](./DEPLOYMENT.md)
+>
+> 本仓库基于 [nxfu/binthere](https://github.com/nxfu/binthere)，默认使用简体中文。
+> 点击页面右上角的 **English / 中文** 可随时切换语言，选择会自动保存。
+> 创建、分享、密码、阅读、错误提示均已适配中文，原有端到端加密与阅后即焚机制保持不变。
+
 <div align="center">
 
 <p align="center">

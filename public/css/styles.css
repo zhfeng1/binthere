@@ -50,8 +50,8 @@
   --ease: cubic-bezier(.22, .9, .28, 1);
   --ease-io: cubic-bezier(.4, 0, .2, 1);   /* ease-in-out — the theme flip */
   --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
-  --sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang SC', 'Microsoft YaHei', monospace;
 }
 
 /* ── tokens — dark "Plate" (engraver's plate; the shipped default) ───────── */
@@ -216,7 +216,7 @@ html.theming, html.theming *, html.theming *::before, html.theming *::after {
 .wm-a { font-weight: 500; color: var(--ink); }
 .wm-b { font-style: italic; font-weight: 400; color: var(--accent); transition: color .2s ease; }
 .brand:hover .wm-b { color: var(--ink); }
-.topbar-right { display: inline-flex; align-items: center; gap: .5rem; }
+.topbar-right { display: inline-flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: .5rem; min-width: 0; }
 .back { display: inline-flex; align-items: center; gap: .45rem; font-family: var(--mono); font-size: .72rem; letter-spacing: .06em;
   color: var(--ink-2); padding: .38rem .7rem; border: 1px solid var(--rule-2); border-radius: 3px; background: transparent;
   transition: color .14s ease, border-color .14s ease, background-color .14s ease; }
@@ -257,6 +257,36 @@ html.theming, html.theming *, html.theming *::before, html.theming *::after {
 .theme-toggle .ico-moon { display: none; }
 html.dark .theme-toggle .ico-sun { display: none; }
 html.dark .theme-toggle .ico-moon { display: block; }
+
+.language-toggle { display: inline-flex; align-items: center; justify-content: center; min-width: 72px; min-height: 44px;
+  padding: .4rem .65rem; border: 1px solid var(--rule-2); border-radius: 3px; background: transparent;
+  color: var(--ink-2); font-family: var(--sans); font-size: .8125rem; font-weight: 500;
+  cursor: pointer; touch-action: manipulation; transition: color .14s ease, background-color .14s ease, border-color .14s ease; }
+.language-toggle:hover { color: var(--ink); background: var(--sheet-2); border-color: var(--rule-3); }
+.language-toggle:active { background: var(--sheet); }
+.topbar-right .theme-toggle { width: 44px; height: 44px; flex: none; }
+.topbar-right .gh, .topbar-right .back { min-height: 44px; }
+.brand { flex-shrink: 0; }
+@media (max-width: 480px) {
+  .topbar { gap: .6rem; padding-left: 1rem; padding-right: 1rem; }
+  .topbar-right .gh-stars { display: none; }
+  .topbar-right .gh { min-width: 44px; justify-content: center; }
+  .topbar-right .back [data-i18n] { display: none; }
+  .topbar-right .back { padding-inline: .5rem; min-width: 44px; justify-content: center; }
+}
+
+/* System Chinese fonts keep the site self-hosted and legible without a large
+   font download. These rules affect interface typography, never note text. */
+html:lang(zh) .title, html:lang(zh) .modal-title {
+  font-family: 'Songti SC', 'Noto Serif CJK SC', 'Microsoft YaHei', serif;
+  line-height: 1.35; letter-spacing: .015em;
+}
+html:lang(zh) .title { font-size: clamp(2rem, 6vw, 3.25rem); }
+html:lang(zh) .title-em { font-style: normal; }
+html:lang(zh) .subtitle { line-height: 1.85; max-width: 36em; }
+html:lang(zh) .eyebrow, html:lang(zh) .feat, html:lang(zh) .pill,
+html:lang(zh) .copy-btn { font-size: .75rem; letter-spacing: .04em; }
+html:lang(zh) .foot-crypto { line-height: 1.8; }
 
 /* ── head block ──────────────────────────────────────────────────────────── */
 .head { margin: 2.1rem 0 2rem; }

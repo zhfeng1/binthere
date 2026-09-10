@@ -6,7 +6,7 @@
 // one per page load — well inside the 60/hour unauthenticated limit. Nothing
 // here touches paste data; it is a public, visitor-independent number.
 
-const REPO_API = 'https://api.github.com/repos/nxfu/binthere';
+const REPO_API = 'https://api.github.com/repos/zhfeng1/binthere';
 
 /** How long a count may be stale, at the edge and in the browser. */
 export const STARS_TTL = 1800;
@@ -25,7 +25,7 @@ export async function fetchStars() {
       headers: {
         // GitHub rejects API requests without a User-Agent and asks that it
         // identify the caller.
-        'user-agent': 'binthere (+https://binthere.gaury.dev)',
+        'user-agent': 'binthere (+https://binthere.zhf-mike.workers.dev)',
         accept: 'application/vnd.github+json',
       },
       // Ignored by `wrangler dev` (no edge cache locally), so dev hits GitHub

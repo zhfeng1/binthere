@@ -1,3 +1,5 @@
+import { setAttributeText } from './i18n.js';
+
 // stars.js — fills the topbar GitHub badge with the repo's star count
 // (deferred, first-party, CSP-safe: script-src 'self'). The number comes from
 // /api/stars, the Worker's cached proxy — the page can't call api.github.com
@@ -5,7 +7,7 @@
 // visit paints the badge with the rest of the topbar instead of widening it
 // mid-read; any failure leaves the badge as a plain link to the repository.
 (function () {
-  const KEY = 'binthere:stars:v1';
+  const KEY = 'binthere:stars:zhfeng1:v1';
   const link = document.getElementById('gh-link');
   const wrap = document.getElementById('gh-stars');
   const out = document.getElementById('gh-count');
@@ -22,7 +24,8 @@
     out.textContent = format(n);
     // The visible count is inside the labelled link, so the label has to carry
     // it too or screen readers announce the badge without its number.
-    link.setAttribute('aria-label', 'binthere on GitHub — ' + n + (n === 1 ? ' star' : ' stars'));
+    setAttributeText(link, 'aria-label', n === 1 ? 'binthere on GitHub — {count} star'
+      : 'binthere on GitHub — {count} stars', { count: n });
     wrap.hidden = false;
   };
 
